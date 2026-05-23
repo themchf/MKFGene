@@ -1,84 +1,51 @@
 import streamlit as st
-import pandas as pd
-from src.orchestrator import ProcessOrchestrator
-from src.visualizer import create_volcano_plot
+import analysis_module as am
 
-st.set_page_config(page_title="BioScientist AI", page_icon="🧬", layout="wide")
-
-# Initialize state
-if "analysis_complete" not in st.session_state:
-    st.session_state.analysis_complete = False
-    st.session_state.results = {}
-
-st.title("🧬 AI Bioinformatics Research Assistant")
-st.markdown("Upload Fasta, BAM, VCF, CSV, or PDFs. The AI will auto-detect, analyze, and explain your results.")
-
-# 1. File Upload
-uploaded_files = st.file_uploader(
-    "Drop biological data files here", 
-    accept_multiple_files=True,
-    type=["fasta", "fa", "fastq", "bam", "vcf", "csv", "pdf", "txt"]
+# Configure the genomic workspace layout
+st.set_page_config(
+    page_title="Elite Synthetic Biology Intelligence System",
+    page_icon="🧬",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-if uploaded_files and not st.session_state.analysis_complete:
-    if st.button("Run AI Analysis", type="primary"):
-        with st.status("Initializing AI Research Pipeline...", expanded=True) as status:
-            orchestrator = ProcessOrchestrator()
-            
-            st.write("📂 Identifying file types and extracting metadata...")
-            parsed_data = orchestrator.parse_files(uploaded_files)
-            
-            st.write("🧠 Running statistical analysis and anomaly detection...")
-            stats_results = orchestrator.analyze_data(parsed_data)
-            
-            st.write("🔬 Generating biological explanations and finding literature...")
-            final_report = orchestrator.generate_explanation(stats_results)
-            
-            st.session_state.results = final_report
-            st.session_state.analysis_complete = True
-            status.update(label="Analysis Complete!", state="complete", expanded=False)
-            st.rerun()
+st.title("🧬 AI Genetic Engineering & Synthetic Biology Intelligence System")
+st.markdown("---")
+st.markdown("### `System: Operational` | Specialized Genomic Reasoning & Computational Design Platform")
 
-# 2. Results Dashboard
-if st.session_state.analysis_complete:
-    res = st.session_state.results
+# Sidebar Workspace Configuration
+st.sidebar.header("📥 Genomic Data Ingest")
+st.sidebar.markdown("Upload molecular sequence payloads for analysis.")
+
+uploaded_file = st.sidebar.file_uploader(
+    "Choose a file (FASTA, GenBank, or Text)", 
+    type=["fasta", "gb", "txt"],
+    help="Supports standard genomic and proteomic file structures."
+)
+
+if uploaded_file:
+    # Safely decode the biological file stream
+    sequence_data = uploaded_file.getvalue().decode("utf-8")
+    st.sidebar.success("✅ Sequence Payload Ingested Successfully.")
     
-    # Top-level summary
-    st.header("Executive Summary")
-    st.info(res.get("summary", "No summary generated."))
+    # Main Engine Output Display
+    st.header("📋 Genomic Analysis & Reasoning Report")
     
-    col1, col2 = st.columns([2, 1])
+    # Execute backend intelligence module
+    with st.spinner("Processing molecular data and evaluating engineering constraints..."):
+        report = am.generate_analysis(sequence_data)
+        st.markdown(report)
     
-    with col1:
-        st.subheader("Interactive Visualizations")
-        # Example: Render Volcano plot if we have differential expression data
-        if "diff_expr" in res:
-            fig = create_volcano_plot(res["diff_expr"])
-            st.plotly_chart(fig, use_container_width=True)
-            
-    with col2:
-        st.subheader("Data Quality & Anomalies")
-        if res.get("anomalies"):
-            for anomaly in res["anomalies"]:
-                st.warning(anomaly)
-        else:
-            st.success("Sequencing QC passed. No major anomalies detected.")
-            
-    st.divider()
+    # Visualization Module Hook
+    st.markdown("---")
+    st.subheader("📊 Recommended Workspace Visualizations")
+    st.info("Interactive rendering pipeline initialized. Interactive Plasmid Maps, Sequence Alignment matrices, and Codon Optimization heatmaps can be mounted here.")
     
-    # The "Explain My Results" Feature
-    st.header("Explain My Results")
-    st.markdown(res.get("detailed_explanation", ""))
-    
-    st.subheader("Suggested Next Experiments")
-    for exp in res.get("next_steps", []):
-        st.markdown(f"- {exp}")
-        
-    st.subheader("Literature Citations")
-    for cite in res.get("citations", []):
-        st.markdown(f"📖 {cite}")
-        
-    if st.button("Reset Analysis"):
-        st.session_state.analysis_complete = False
-        st.session_state.results = {}
-        st.rerun()
+else:
+    st.info("💡 Awaiting genomic sequence data. Upload a file via the sidebar module to initiate system reasoning.")
+    st.markdown("""
+    #### Supported Workspace Input Types:
+    * **FASTA/GenBank Records:** Full genome fragments, plasmids, or open reading frames.
+    * **Synthetic Architecture Profiles:** Modular promoter-RBS-CDS construct configurations.
+    * **CRISPR Target Coordinates:** High-level guide-RNA target blocks for editing logic verification.
+    """)
