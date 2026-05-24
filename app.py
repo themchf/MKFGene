@@ -3,8 +3,14 @@ GenAI Platform — AI-Native Genetic Engineering Intelligence System
 Main application entry point
 """
 
-import streamlit as st
+import sys
+import os
 from pathlib import Path
+
+# Ensure the app's own directory is on the path so `pages` and `utils` are importable
+sys.path.insert(0, str(Path(__file__).parent))
+
+import streamlit as st
 
 # ── Page Config ──────────────────────────────────────────────────────────────
 st.set_page_config(
